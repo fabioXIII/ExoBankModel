@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+
+	<!-- Configura gli elementi di MyBatis, inclusi gli alias -->
+	<typeAliases>
+		<typeAlias alias="AccountStatus"
+			type="it.exolab.exobank.model.AccountStatus" />
+		<typeAlias alias="BankAccount"
+			type="it.exolab.exobank.model.BankAccount" />
+		<typeAlias alias="Role" type="it.exolab.exobank.model.Role" />
+		<typeAlias alias="Transactions"
+			type="it.exolab.exobank.model.Transactions" />
+		<typeAlias alias="TransactionStatus"
+			type="it.exolab.exobank.model.TransactionStatus" />
+		<typeAlias alias="TransactionType"
+			type="it.exolab.exobank.model.TransactionType" />
+
+
+	</typeAliases>
+
+	<!-- Altri elementi di configurazione MyBatis -->
+
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<!-- <property name="driver" value="com.mysql.jdbc.Driver"/> -->
+				<!-- <property name="url" value="jdbc:mysql://localhost/biblio"/> -->
+
+				<!-- <property name="username" value="root"/> -->
+				<!-- <property name="password" value=""/> -->
+
+
+				<property name="driver"
+					value="oracle.jdbc.driver.OracleDriver" />
+				<property name="url"
+					value="jdbc:oracle:thin:@192.168.100.37:1521/pdb1" />
+
+				<property name="username" value="u10" />
+				<property name="password" value="u10" />
+			</dataSource>
+		</environment>
+	</environments>
+	<mappers>
+
+
+		<mapper resource="user.xml" />
+		<mapper resource="AccountStatus.xml" />
+		<mapper resource="BankAccount.xml" />
+		<mapper resource="Role.xml" />
+		<mapper resource="Transactions.xml" />
+		<mapper resource="TransactionStatus.xml" />
+		<mapper resource="TransactionType.xml" />
+
+	</mappers>
+
+
+</configuration>

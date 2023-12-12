@@ -1,0 +1,61 @@
+CREATE TABLE "user" (
+    userID NUMBER DEFAULT user_sequence.NEXTVAL PRIMARY KEY,
+    firstName VARCHAR2(50),
+    lastName VARCHAR2(50),
+    email VARCHAR2(100),
+    password VARCHAR2(100),
+    taxID VARCHAR2(20),
+    roleID NUMBER,
+    CONSTRAINT FK_User_Role FOREIGN KEY (roleID) REFERENCES Role(roleID)
+);
+
+CREATE TABLE Transactions (
+    transactionID NUMBER DEFAULT transactions_sequence.NEXTVAL PRIMARY KEY,
+    transactionDate TIMESTAMP DEFAULT SYSTIMESTAMP,
+    amount NUMBER,
+    transactionTypeID NUMBER,
+    transactionStatusID NUMBER,
+    bankAccountID NUMBER,
+    targetBankAccountID NUMBER,
+    CONSTRAINT FK_Transactions_TransactionType FOREIGN KEY (transactionTypeID) REFERENCES TransactionType(transactionTypeID),
+    CONSTRAINT FK_Transactions_TransactionStatus FOREIGN KEY (transactionStatusID) REFERENCES TransactionStatus(transactionStatusID),
+    CONSTRAINT FK_Transactions_BankAccount FOREIGN KEY (bankAccountID) REFERENCES BankAccount(bankAccountID),
+    CONSTRAINT FK_Transactions_TargetBankAccount FOREIGN KEY (targetBankAccountID) REFERENCES BankAccount(bankAccountID)
+);
+CREATE TABLE bankAccount (
+    bankAccountID NUMBER  DEFAULT bankAccount_sequence.NEXTVAL PRIMARY KEY,
+    accountNumber VARCHAR2(20),
+    balance NUMBER,
+    accountStatusID NUMBER,
+    userID NUMBER,
+    CONSTRAINT FK_BankAccount_AccountStatus FOREIGN KEY (accountStatusID) REFERENCES AccountStatus(id),
+    CONSTRAINT FK_BankAccount_User FOREIGN KEY (userID) REFERENCES "user"(userID)
+);
+
+CREATE TABLE TransactionStatus (
+    transactionStatusID NUMBER  PRIMARY KEY,
+    transactionStatusName VARCHAR2(50)
+);
+insert into transactionstatus values(2 , 'CONFIRMED');
+COMMIT;
+CREATE TABLE TransactionType (
+    transactionTypeID NUMBER PRIMARY KEY,
+    transactionTypeName VARCHAR2(50)
+);
+INSERT INTO TRANSACTIONTYPE VALUES(3 , 'DEPOSIT');
+COMMIT;
+
+
+CREATE TABLE AccountStatus (
+    id NUMBER PRIMARY KEY,
+    status VARCHAR2(50)
+);
+insert into AccountStatus values (3, 'DEACTIVATED');
+COMMIT;
+
+
+CREATE SEQUENCE bankAccount_sequence
+  START WITH 1
+  INCREMENT BY 1
+  NOCACHE
+  NOCYCLE;

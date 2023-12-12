@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="it.exolab.exobank.mapper.TransactionsMapper">
+
+    <select id="findAllTransactions" resultMap ="TransactionsResultMap">
+SELECT
+    t.transactionID,
+    t.transactionDate,
+    t.amount,
+    tt.transactionTypeID,
+    tt.transactionTypeName AS transactionTypeName,  
+    ts.transactionStatusID,
+    ts.transactionStatusName AS transactionStatusName,  
+    ba.bankAccountID AS bankAccountID,
+    tba.bankAccountID AS targetBankAccountID
+FROM
+    Transactions t
+LEFT JOIN
+    TransactionTypeID tt ON t.transactionTypeID = tt.transactionTypeID
+LEFT JOIN
+    TransactionStatus ts ON t.transactionStatusID = ts.transactionStatusID
+LEFT JOIN
+    BankAccount ba ON t.bankAccountID = ba.bankAccountID
+LEFT JOIN
+    BankAccount tba ON t.targetBankAccountID = tba.bankAccountID
+
+    </select>
+    
+    <update id="updateTransactionStatus" parameterType="it.exolab.exobank.model.Transactions">
+  UPDATE Transactions
+  SET 
+      TRANSACTIONTYPEID = #{transactionTypeID.transactionTypeID},
+      TRANSACTIONSTATUSID = #{transactionStatusID.transactionStatusID}
+  WHERE TRANSACTIONID = #{transactionID}
+</update>
+
+<!-- Mappa questa query all'azione di inserimento di una nuova transazione -->
+<insert id="insertTransaction" parameterType="it.exolab.exobank.model.Transactions">
+  INSERT INTO Transactions (AMOUNT, TRANSACTIONTYPEID, TRANSACTIONSTATUSID, BANKACCOUNTID, TARGETBANKACCOUNTID)
+  VALUES (#{amount}, #{transactionTypeID.transactionTypeID}, #{transactionStatusID.transactionStatusID}, #{bankAccountID.bankAccountID},
+          <choose>
+            <when test="targetBankAccountID != null">
+              #{targetBankAccountID.bankAccountID, jdbcType=INTEGER}
+            </when>
+            <otherwise>
+              NULL
+            </otherwise>
+          </choose>)
+</insert>
+
+<select id= "findUserTransactions" resultMap="TransactionsResultMap" parameterType="java.lang.Integer">
+SELECT
+    T.TRANSACTIONID,
+    T.TRANSACTIONDATE,
+    T.AMOUNT,
+    T.TRANSACTIONTYPEID,
+    TT.TRANSACTIONTYPENAME,
+    TS.TRANSACTIONSTATUSID,
+    TS.TRANSACTIONSTATUSNAME,
+    T.BANKACCOUNTID,
+    T.TARGETBANKACCOUNTID
+FROM
+    TRANSACTIONS T
+JOIN
+    TRANSACTIONSTATUS TS ON T.TRANSACTIONSTATUSID = TS.TRANSACTIONSTATUSID
+JOIN
+    TRANSACTIONTYPEID TT ON T.TRANSACTIONTYPEID = TT.TRANSACTIONTYPEID
+WHERE
+    T.BANKACCOUNTID = #{bankAccountId}
+    ORDER BY
+    TS.TRANSACTIONSTATUSNAME desc
+</select>
+
+
+<select id="findUserTransactions2" resultType = "it.exolab.exobank.model.UserTransactions" parameterType="java.lang.Integer">
+    SELECT
+        T.TRANSACTIONID as transactionId,
+        T.TRANSACTIONDATE as transactionDate,
+        T.AMOUNT as amount,
+        T.TRANSACTIONTYPEID as transactionTypeId,
+        T.TARGETBANKACCOUNTID as targetBankAccountId,    
+        TS.TRANSACTIONSTATUSNAME as transactionStatusName,
+        TT.TRANSACTIONTYPENAME as transactionTypeName,
+        BA.BANKACCOUNTID as bankAccountId,
+        BA.ACCOUNTNUMBER as accountNumber,
+        BA.BALANCE AS balance,
+        BA.ACCOUNTSTATUSID AS accountStatusId,
+        U.USERID as userId,
+        U.FIRSTNAME as firstName,
+        U.LASTNAME as lastName,
+        U.EMAIL AS email,
+        U.PASSWORD as password,
+        U.ROLEID AS roleId,
+        U.TAXID AS taxId
+    FROM
+        TRANSACTIONS T
+    JOIN
+        TRANSACTIONSTATUS TS ON T.TRANSACTIONSTATUSID = TS.TRANSACTIONSTATUSID
+    JOIN
+        BANKACCOUNT BA ON T.BANKACCOUNTID = BA.BANKACCOUNTID
+    JOIN
+        "user" U ON BA.USERID = U.USERID
+    JOIN
+        TRANSACTIONTYPE TT ON T.TRANSACTIONTYPEID = TT.TRANSACTIONTYPEID
+    WHERE
+        T.BANKACCOUNTID = #{bankAccountId}
+    ORDER BY
+        TS.TRANSACTIONSTATUSNAME DESC
+</select>
+
+
+
+
+
+    
+
+    <resultMap id="TransactionsResultMap" type="it.exolab.exobank.model.Transactions">
+        <id property="transactionID" column="TRANSACTIONID"/>
+        <result property="transactionDate" column="TRANSACTIONDATE"/>
+        <result property="amount" column="AMOUNT"/>
+        <association property="transactionTypeID" javaType="it.exolab.exobank.model.TransactionType">
+            <id property="transactionTypeID" column="TRANSACTIONTYPEID"/>
+            <result property="transactionTypeName" column="transactionTypeName"/>
+        </association>
+        <association property="transactionStatusID" javaType="it.exolab.exobank.model.TransactionStatus">
+            <id property="transactionStatusID" column="TRANSACTIONSTATUSID"/>
+            <result property="transactionStatusName" column="transactionStatusName"/>
+        </association>
+        <association property="bankAccountID" javaType="it.exolab.exobank.model.BankAccount">
+            <id property="bankAccountID" column="BANKACCOUNTID"/>
+            <result property="accountNumber" column="ACCOUNTNUMBER"/>
+            <result property="balance" column="BALANCE"/>
+        </association>
+        <association property="targetBankAccountID" javaType="it.exolab.exobank.model.BankAccount">
+        <id property="bankAccountID" column="TARGETBANKACCOUNTID"/>
+        <result property="accountNumber" column="ACCOUNTNUMBER"/>
+        <result property="balance" column="BALANCE"/>
+    </association>
+    </resultMap>
+
+</mapper>

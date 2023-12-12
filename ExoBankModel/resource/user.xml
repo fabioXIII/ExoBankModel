@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  
+<mapper namespace="it.exolab.exobank.mapper.UserMapper">
+
+    <select id="findAllUser" resultType="it.exolab.exobank.model.User">
+SELECT u.*, r.ROLEID AS USER_ROLEID
+FROM "user" u
+JOIN role r ON u.ROLEID = r.ROLEID;
+    </select>
+    
+    <delete id="deleteUser" parameterType="Integer">
+    DELETE FROM "user" WHERE USERID = #{userId}
+</delete>
+
+<insert id="insertUser"  parameterType="it.exolab.exobank.model.User" >
+  INSERT INTO "user" (firstname, lastname, email, password, taxid ,roleid)
+  VALUES (#{firstName}, #{lastName}, #{email}, #{password}, #{taxID}, #{roleID.roleID})
+</insert>
+
+<!-- <select id="findByEmailPassword" resultType = "it.exolab.exobank.model.User" -->
+<!-- parameterType ="it.exolab.exobank.model.User" -->
+<!-- resultMap= "UserResultMap"> -->
+
+<!-- SELECT -->
+<!--     u.USERID AS USERID, -->
+<!--     u.FIRSTNAME AS FIRSTNAME, -->
+<!--     u.LASTNAME AS LASTNAME, -->
+<!--     u.EMAIL AS EMAIL, -->
+<!--     u.PASSWORD AS PASSWORD, -->
+<!--     u.TAXID AS TAXID, -->
+<!--     r.ROLEID AS ROLE_ROLEID, -->
+<!--     r.name -->
+<!-- FROM "user" u -->
+<!-- INNER JOIN ROLE r ON u.ROLEID = r.ROLEID -->
+<!-- WHERE u.EMAIL = #{email} -->
+<!-- AND u.PASSWORD = #{password} -->
+<!-- </select> -->
+
+<select id="findByEmailPassword" resultType="it.exolab.exobank.model.User" parameterType="it.exolab.exobank.model.User" resultMap="UserResultMap">
+    SELECT
+        u.USERID AS USERID,
+        u.FIRSTNAME AS FIRSTNAME,
+        u.LASTNAME AS LASTNAME,
+        u.EMAIL AS EMAIL,
+        u.PASSWORD AS PASSWORD,
+        u.TAXID AS TAXID,
+        r.ROLEID AS ROLE_ROLEID,
+        r.name
+    FROM "user" u
+    INNER JOIN ROLE r ON u.ROLEID = r.ROLEID
+    WHERE u.EMAIL = #{email}
+    AND u.PASSWORD = #{password}
+</select>
+
+<update id ="updateUser" parameterType = "it.exolab.exobank.model.User">
+UPDATE "user" 
+SET PASSWORD= #{password} , email = #{email}
+WHERE USERID = #{userID}
+</update>
+
+
+
+    
+<resultMap id="UserResultMap" type="it.exolab.exobank.model.User">
+    <id property="userID" column="USERID"/>
+    <result property="firstName" column="FIRSTNAME"/>
+    <result property="lastName" column="LASTNAME"/>
+    <result property="email" column="EMAIL"/>
+    <result property="password" column="PASSWORD"/>
+    <result property="taxID" column="TAXID"/>
+   <association property="roleID" javaType="it.exolab.exobank.model.Role">
+        <id property="roleID" column="ROLE_ROLEID"/>
+        <result property="name" column="ROLE_ROLENAME"/>
+    </association>
+</resultMap>
+
+
+    
+    
+
+</mapper>
+
+
+

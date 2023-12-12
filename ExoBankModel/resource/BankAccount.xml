@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+
+
+<mapper namespace="it.exolab.exobank.mapper.BankAccountMapper">
+
+<select id = "findAllBankAccount" resultMap="BankAccountResultMap">
+
+SELECT
+    ba.bankaccountid,
+    ba.accountnumber,
+    ba.balance,
+    ba.userid,
+    a.id AS accountStatusID,
+    a.status AS accountStatus,
+    u.firstname,
+    u.lastName,
+    u.taxID
+FROM
+    bankaccount ba
+JOIN
+    "user" u ON ba.userID = u.userID
+JOIN
+    accountstatus a ON ba.accountstatusid = a.id
+
+</select>
+
+
+<select id ="findBankAccountById" parameterType="Integer" resultMap="BankAccountResultMap">
+select * from bankaccount
+where bankaccountid =#{bankAccountID}
+</select>
+
+
+
+<select id = "findBankAccountByUserId" parameterType = "it.exolab.exobank.model.User" 
+resultMap="BankAccountResultMap">
+SELECT
+    ba.bankaccountid,
+    ba.accountnumber,
+    ba.balance,
+    ba.userid,
+    ba.accountstatusid,
+    a.status AS accountstatus,
+    u.firstName,
+    u.lastName,
+    u.taxID,
+    u.email
+FROM
+    bankaccount ba
+JOIN
+    "user" u ON ba.userID = u.userID
+JOIN
+    accountstatus a ON ba.accountstatusid = a.id
+    where u.userid = #{userID}
+
+</select>
+
+<update id = "updateBankAccountStatus" parameterType="it.exolab.exobank.model.BankAccount">
+ UPDATE BANKACCOUNT
+  SET
+    ACCOUNTNUMBER = #{accountNumber},
+    BALANCE = #{balance},
+    ACCOUNTSTATUSID = #{accountStatusID.id},
+    USERID = #{userID.userID}  
+  WHERE BANKACCOUNTID = #{bankAccountID}
+
+
+
+</update>
+
+
+<update id="updateBankAccountBalance">
+<!--     UPDATE BANKACCOUNT -->
+<!--     SET BALANCE =  -->
+<!--     <choose> -->
+<!--         <when test="newBalance != null"> -->
+<!--             #{newBalance} -->
+<!--         </when> -->
+<!--         <when test="newBalanceDestination != null"> -->
+<!--             #{newBalanceDestination} -->
+<!--         </when> -->
+<!--         <otherwise> -->
+<!--             0 -->
+<!--         </otherwise> -->
+<!--     </choose> -->
+<!--     WHERE BANKACCOUNTID =  -->
+<!--     <choose> -->
+<!--         <when test="newBalance != null"> -->
+<!--             #{bankAccountId} -->
+<!--         </when> -->
+<!--         <when test="newBalanceDestination != null"> -->
+<!--             #{targetBankAccountId} -->
+<!--         </when> -->
+<!--         <otherwise> -->
+<!--             0 -->
+<!--         </otherwise> -->
+<!--     </choose> -->
+UPDATE BANKACCOUNT
+SET BALANCE = #{newBalance}
+WHERE BANKACCOUNTID= #{bankAccountId}
+</update>
+
+
+
+<insert id="insertBankAccount" parameterType="it.exolab.exobank.model.BankAccount">
+  INSERT INTO BANKACCOUNT
+  <trim prefix="(" suffix=")" suffixOverrides=",">
+    <if test="accountNumber != null">ACCOUNTNUMBER,</if>
+    <if test="balance != null">BALANCE,</if>
+    <if test="accountStatusID != null">ACCOUNTSTATUSID,</if>
+    <if test="userID != null">USERID,</if>
+  </trim>
+  <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+    <if test="accountNumber != null">#{accountNumber},</if>
+    <if test="balance != null">#{balance},</if>
+    <if test="accountStatusID != null">#{accountStatusID.id},</if>
+    <if test="userID != null">#{userID.userID},</if>
+  </trim>
+</insert>
+
+
+
+
+<resultMap id="BankAccountResultMap" type="it.exolab.exobank.model.BankAccount">
+    <id property="bankAccountID" column="BANKACCOUNTID"/>
+    <result property="accountNumber" column="ACCOUNTNUMBER"/>
+    <result property="balance" column="BALANCE"/>
+    <association property="accountStatusID" javaType="it.exolab.exobank.model.AccountStatus">
+        <id property="id" column="ACCOUNTSTATUSID"/>
+        <result property="status" column="ACCOUNTSTATUS"/>
+    </association>
+    <association property="userID" javaType="it.exolab.exobank.model.User">
+        <id property="userID" column="USERID"/>
+        <result property="firstName" column="FIRSTNAME"/>
+        <result property="lastName" column="LASTNAME"/>
+        <result property="email" column="EMAIL"/>
+        <result property="password" column="PASSWORD"/>
+        <result property="taxID" column="TAXID"/>
+        <association property="roleID" javaType="it.exolab.exobank.model.Role">
+            <id property="roleID" column="ROLEID"/>
+            <result property="name" column="NAME"/>
+        </association>
+    </association>
+</resultMap>
+
+</mapper>
